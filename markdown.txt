@@ -1,2 +1,5 @@
-# new annoucement
-join our [discord server](https://twisk.fun/discord) to unlock **full mode version + bots**
+# update to 1.1
+**🔥Changelog**
+- Added Lesson Shortner ( credit to freepentestz )
+- Added Webhook Feature
+- Changed some UI to improve DuoHacker performace
