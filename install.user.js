@@ -1,14 +1,16 @@
 // ==UserScript==
 // @name         DuoHacker Full Version
-// @description  Best Free Duolingo Hack with XP Farming, Gems Farming, Streaks Farming, Auto Quest Daily!
-// @namespace    https://twisk.fun/install
-// @version      1.1.0
-// @author       MintDevs
+// @description  The #1 Duolingo Cheat with Fastest XP & Gems Farming / High Speed Increasing Streaks and Auto Daily Quest
+// @namespace    https://twisk.fun
+// @version      1.2.0
+// @author       Mint
 // @match        https://*.duolingo.com/*
 // @match        https://*.duolingo.cn/*
 // @icon         https://github.com/helloticc/DuoHacker/blob/main/DuoHacker.png?raw=true
+// @grant        none
+// @license      MIT
 // ==/UserScript==
-const VERSION = "1.1.0";
+const VERSION = "1.2.0";
 const SAFE_DELAY = 2000;
 const FAST_DELAY = 300;
 const STORAGE_KEY = 'duohacker_accounts';
@@ -66,6 +68,8 @@ let farmingInterval = null;
 let savedAccounts = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
 let duolingoMaxEnabled = localStorage.getItem('duohacker_duolingo_max') === 'true';
 let sessionData = JSON.parse(localStorage.getItem(SESSION_KEY) || '{}');
+let currentLessonCount = Number(sessionData.currentLessonCount ?? 0);
+let lessonsToSolve = Number(sessionData.lessonsToSolve ?? 0);
 let autoNameEnabled = localStorage.getItem('duohacker_auto_name') !== 'false';
 let duolingoSuperEnabled = localStorage.getItem('duohacker_duolingo_super') === 'true';
 if (sessionData && sessionData.currentLessonCount !== undefined) {
@@ -2210,125 +2214,6 @@ btn.innerHTML = `
     });
     console.log("✅ Item Shop opened");
 };
-const farmXpBooster = async (amount) => {
-    try {
-        const url = `https://stories.duolingo.com/api2/stories/fr-en-le-passeport/complete`;
-        const now = Math.floor(Date.now() / 1000);
-        const duration = Math.floor(Math.random() * 121 + 300);
-        const xpAmount = Math.max(1, amount);
-        const payload = {
-            "awardXp": true,
-            "completedBonusChallenge": true,
-            "fromLanguage": userInfo.fromLanguage || "en",
-            "learningLanguage": userInfo.learningLanguage || "fr",
-            "hasXpBoost": false,
-            "illustrationFormat": "svg",
-            "isFeaturedStoryInPracticeHub": true,
-            "isLegendaryMode": true,
-            "isV2Redo": false,
-            "isV2Story": false,
-            "masterVersion": true,
-            "maxScore": 0,
-            "score": 0,
-            "happyHourBonusXp": Math.min(xpAmount, 469),
-            "startTime": now,
-            "endTime": now + duration,
-        };
-        return await sendRequestWithDefaultHeaders({
-            url: url,
-            method: "POST",
-            payload: payload
-        });
-    } catch (e) {
-        console.error("farmXpBooster error:", e);
-        return null;
-    }
-};
-const booster = {
-    isRunning: false,
-    type: 'xp',
-    goal: 5000,
-    startValue: 0,
-    start: async () => {
-        const goalInput = document.getElementById('_boost_goal');
-        const typeSelect = document.getElementById('_boost_type');
-        if (!goalInput || !typeSelect) return;
-        booster.goal = parseInt(goalInput.value);
-        booster.type = typeSelect.value;
-        booster.startValue = booster.type === 'xp' ? userInfo.totalXp : userInfo.gems;
-        booster.isRunning = true;
-        const btn = document.getElementById('_boost_start_btn');
-        if (btn) {
-            btn.textContent = "Stop Boosting";
-            btn.style.background = "#dc2626";
-            btn.style.borderColor = "#b91c1c";
-        }
-        logToConsole(`🚀 Boosting ${booster.type.toUpperCase()}... Target: +${booster.goal}`, 'info');
-        await booster.run();
-    },
-    stop: () => {
-        booster.isRunning = false;
-        const btn = document.getElementById('_boost_start_btn');
-        if (btn) {
-            btn.textContent = "Start Boosting";
-            btn.style.background = "#2563eb";
-            btn.style.borderColor = "#1d4ed8";
-        }
-        logToConsole('🛑 Boosting stopped', 'info');
-    },
-    run: async () => {
-        const delayMs = currentMode === 'safe' ? 1000 : 300;
-        while (booster.isRunning) {
-            try {
-                const currentValue = booster.type === 'xp' ? userInfo.totalXp : userInfo.gems;
-                const gained = currentValue - booster.startValue;
-                const remaining = booster.goal - gained;
-                booster.updateProgress(gained);
-                if (remaining <= 0) {
-                    booster.updateProgress(booster.goal); // Đảm bảo UI hiện 100%
-                    booster.stop();
-                    logToConsole(`🎉 Finished! Gained ${gained} ${booster.type}!`, 'success');
-                    await refreshUserData();
-                    break;
-                }
-                let amountToFarm = 0;
-                let res;
-                if (booster.type === 'xp') {
-                    amountToFarm = remaining >= 500 ? 500 : remaining;
-                    res = await farmXpBooster(amountToFarm);
-                } else {
-                    amountToFarm = 30;
-                    res = await farmGemOnce();
-                }
-                if (res?.ok) {
-                    if (booster.type === 'xp') userInfo.totalXp += amountToFarm;
-                    else userInfo.gems += amountToFarm;
-                    if (booster.type === 'xp') {
-                        if (gained % 1000 < amountToFarm) {
-                            logToConsole(`⚡ Boosted +${amountToFarm} XP (Remaining: ${remaining - amountToFarm})`, 'info');
-                        }
-                    }
-                } else {
-                    logToConsole('⚠️ Request failed, waiting...', 'warning');
-                    await new Promise(r => setTimeout(r, 2000));
-                }
-                await new Promise(r => setTimeout(r, delayMs));
-            } catch (error) {
-                console.error(error);
-                await new Promise(r => setTimeout(r, 500));
-            }
-        }
-    },
-    updateProgress: (gainedAmount) => {
-        const percentage = Math.min(100, Math.floor((gainedAmount / booster.goal) * 100));
-        const progressBar = document.getElementById('_boost_progress_bar');
-        const percentageText = document.getElementById('_boost_percentage');
-        if (progressBar) progressBar.style.width = percentage + '%';
-        if (percentageText) percentageText.textContent = percentage + '%';
-        updateEarnedStats();
-        updateUserInfo();
-    }
-};
 const autoSolver = {
     findReact: (dom, traverseUp = 1) => {
         const key = Object.keys(dom).find(key => {
@@ -2834,10 +2719,6 @@ const initInterface = () => {
   <img src="https://d35aaqx5ub95lt.cloudfront.net/vendor/0e58a94dda219766d98c7796b910beee.svg"
        style="width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));">
 </button>
-<button id="_booster_menu_btn" class="_control_btn _booster">
-    <img src="https://d35aaqx5ub95lt.cloudfront.net/images/icons/68c1fd0f467456a4c607ecc0ac040533.svg"
-         style="width: 28px; height: 28px; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));">
-</button>
 <button id="_accounts_btn" class="_control_btn _accounts">
     <img src="https://d35aaqx5ub95lt.cloudfront.net/images/profile/48b8884ac9d7513e65f3a2b54984c5c4.svg"
          style="width: 26px; height: 26px; object-fit: contain; filter: drop-shadow(0 1px 2px rgba(0,0,0,0.1));">
@@ -3098,7 +2979,7 @@ const initInterface = () => {
       </div>
     </div>
 <div class="_footer">
-    <span>© 2025 DuoHacker by <a href="https://www.duolingo.com/profile/LiamSmith92" target="_blank" style="color: #39FF14; text-decoration: none; text-shadow: 0 0 5px #39FF14, 0 0 10px #39FF14;">LiamSmith92</a></span>
+    <span>© 2026 DuoHacker by <a href="https://www.duolingo.com/profile/sayk1wiondiscord" target="_blank" style="color: #00FFFF; text-decoration: none; text-shadow: 0 0 5px #39FF14, 0 0 10px #39FF14;">Mint</a></span>
     <div class="_footer_socials">
 <a href="https://twisk.fun/discord" target="_blank" title="Discord">
   <img
@@ -3211,16 +3092,6 @@ const initInterface = () => {
           </div>
           <p class="_setting_description">Hide images to reduce RAM usage</p>
         </div>
-      <!-- SUPERLINKS CHECKER SECTION -->
-      <div class="_settings_section _superlinks_section">
-        <h3>🔗 Superlinks Checker</h3>
-        <p class="_setting_description" style="margin-bottom: 12px;">Check if a Superlinks invitation is valid</p>
-        <div class="_superlinks_input_group">
-          <input type="text" id="_superlinks_input" class="_superlinks_input" placeholder="Paste link or ID (e.g., 2-N4GT-L7SD-W1LC-U2XF)">
-          <button id="_superlinks_check_btn" class="_superlinks_check_btn">Check</button>
-        </div>
-        <div id="_superlinks_result" class="_superlinks_result"></div>
-      </div>
       <!-- PREMIUM FEATURES SECTION -->
       <div class="_settings_section">
         <h3>Premium Features</h3>
@@ -3284,49 +3155,6 @@ const initInterface = () => {
             </button>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-</div>
-<div id="_booster_modal" class="_modal" style="display:none">
-  <div class="_modal_overlay"></div>
-  <div class="_modal_container" style="background: #1f1f1f; border: 1px solid #3a3a3a; color: #d0d0d0;">
-    <div class="_modal_header" style="background: #2a2a2a; border-bottom: 1px solid #3a3a3a;">
-      <h2 style="color: #fff; font-size: 16px;">🚀 XP & Gem Booster</h2>
-      <button id="_close_booster" class="_close_modal_btn" style="background: transparent; color: #b0b0b0;">✕</button>
-    </div>
-    <div class="_modal_content" style="padding: 24px;">
-      <div class="_settings_section">
-        <!-- INPUTS -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
-            <div>
-                <label style="font-size: 12px; color: #b0b0b0; text-transform: uppercase; display: block; margin-bottom: 8px;">Boost Type</label>
-                <select id="_boost_type" style="width: 100%; padding: 8px 12px; background: #1f1f1f; border: 1px solid #3a3a3a; border-radius: 4px; color: #fff; outline: none;">
-                    <option value="xp">XP</option>
-                    <option value="gems">GEMS</option>
-                </select>
-            </div>
-            <div>
-                <label style="font-size: 12px; color: #b0b0b0; text-transform: uppercase; display: block; margin-bottom: 8px;">Target Goal</label>
-                <input type="number" id="_boost_goal" value="5000" step="100" style="width: 100%; padding: 8px 12px; background: #1f1f1f; border: 1px solid #3a3a3a; border-radius: 4px; color: #fff; outline: none;">
-            </div>
-        </div>
-        <!-- PROGRESS BAR (WAVEX STYLE) -->
-        <div style="background: #2a2a2a; border: 1px solid #3a3a3a; border-radius: 8px; padding: 20px; margin-bottom: 24px;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                <span style="color: #b0b0b0; font-size: 12px;">Progress</span>
-                <span id="_boost_percentage" style="color: #fff; font-weight: 600;">0%</span>
-            </div>
-            <div style="background: #1f1f1f; height: 24px; border-radius: 12px; overflow: hidden;">
-                <div id="_boost_progress_bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, #4ade80, #22c55e); transition: width 0.3s ease;"></div>
-            </div>
-            <!-- Ẩn số đếm đi cho giống Wavex -->
-            <div id="_boost_count" style="display: none;"></div>
-        </div>
-        <!-- BUTTON -->
-        <button id="_boost_start_btn" style="width: 100%; padding: 14px; background: #2563eb; border: 1px solid #1d4ed8; color: #fff; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; transition: all 0.2s ease;">
-          Start Boosting
-        </button>
       </div>
     </div>
   </div>
@@ -3875,16 +3703,14 @@ body[data-lite-mode="true"] #_backdrop {
   border-color: rgba(229, 57, 53, 0.2);
 }
 ._control_btn._accounts,
-._control_btn._settings,
-._control_btn._booster {
+._control_btn._settings {
   background: var(--primary-color);
   color: white;
   border-color: var(--primary-color);
   box-shadow: 0 2px 8px var(--primary-glow);
 }
 ._control_btn._accounts:hover,
-._control_btn._settings:hover,
-._control_btn._booster:hover {
+._control_btn._settings:hover {
   background: var(--primary-dark);
   box-shadow: 0 4px 12px var(--primary-glow);
 }
@@ -5918,24 +5744,6 @@ const addEventListeners = () => {
             document.getElementById('_leaderboard_modal').style.display = 'none';
         }
     });
-    document.getElementById('_booster_menu_btn')?.addEventListener('click', () => {
-        document.getElementById('_booster_modal').style.display = 'flex';
-    });
-    document.getElementById('_close_booster')?.addEventListener('click', () => {
-        document.getElementById('_booster_modal').style.display = 'none';
-    });
-    document.getElementById('_booster_modal')?.addEventListener('click', (e) => {
-        if (e.target.classList.contains('_modal_overlay')) {
-            document.getElementById('_booster_modal').style.display = 'none';
-        }
-    });
-    document.getElementById('_boost_start_btn')?.addEventListener('click', () => {
-        if (booster.isRunning) booster.stop();
-        else booster.start();
-    });
-    document.getElementById('_inject_solver_toggle')?.addEventListener('click', () => {
-        autoSolver.toggle();
-    });
     document.getElementById('_inject_solver_toggle')?.addEventListener('click', () => {
         const toggle = document.getElementById('_inject_solver_toggle');
         INJECT_SOLVER_ENABLED = !INJECT_SOLVER_ENABLED;
@@ -6743,52 +6551,59 @@ const farmGems = async (delayMs) => {
         }
     }
 };
-const repairStreak = async () => {
-    logToConsole('Starting streak repair...', 'info');
-    try {
-        if (!userInfo.streakData?.currentStreak) {
-            logToConsole('No streak to repair!', 'error');
-            return;
-        }
-        const startStreakDate = userInfo.streakData.currentStreak.startDate;
-        const endStreakDate = userInfo.streakData.currentStreak.endDate;
-        const startStreakTimestamp = Math.floor(new Date(startStreakDate).getTime() / 1000);
-        const endStreakTimestamp = Math.floor(new Date(endStreakDate).getTime() / 1000);
-        const expectedStreak = Math.floor((endStreakTimestamp - startStreakTimestamp) / (60 * 60 * 24)) + 1;
-        if (expectedStreak > userInfo.streak) {
-            logToConsole(`Found ${expectedStreak - userInfo.streak} frozen days. Repairing...`, 'warning');
-            let currentTimestamp = Math.floor(Date.now() / 1000);
-            for (let i = 0; i < expectedStreak && isRunning; i++) {
-                await farmSessionOnce(currentTimestamp, currentTimestamp + 60);
-                currentTimestamp -= 86400;
-                logToConsole(`Repaired day ${i + 1}/${expectedStreak}`, 'info');
-                await delay(currentMode === 'safe' ? SAFE_DELAY : FAST_DELAY);
-            }
-            const updatedUser = await getUserInfo(sub);
-            if (updatedUser.streak >= expectedStreak) {
-                logToConsole(`Streak repair completed! New streak: ${updatedUser.streak}`, 'success');
-                userInfo = updatedUser;
-                totalEarned.streak += (updatedUser.streak - userInfo.streak);
-                updateUserInfo();
-                updateEarnedStats();
-                saveSessionData();
-            }
-        } else {
-            logToConsole('No frozen streak detected', 'info');
-        }
-    } catch (error) {
-        logToConsole(`Streak repair failed: ${error.message}`, 'error');
-    } finally {
+const farmStreak = async () => {
+    const useSafeMode = prompt(
+        'Do you want to use Safe Streak Farming?\n\n' +
+        'Safe Mode: Only farms streaks from account creation date to prevent ban risk\n' +
+        'Normal Mode: Farms unlimited streaks\n\n' +
+        'Type Y for Safe Mode, N for Normal Mode:',
+        'Y'
+    );
+
+    if (!useSafeMode) {
+        logToConsole('Streak farming cancelled', 'info');
         stopFarming();
+        return;
+    }
+
+    const isSafeMode = useSafeMode.toUpperCase() === 'Y';
+
+    if (isSafeMode) {
+        logToConsole('🛡️ Starting SAFE streak farming...', 'success');
+        await farmStreakSafe();
+    } else {
+        logToConsole('⚠️ Starting NORMAL streak farming (higher risk)...', 'warning');
+        await farmStreakNormal();
     }
 };
-const farmStreak = async () => {
-    logToConsole('Starting streak farming...', 'info');
+const farmStreakSafe = async () => {
+    logToConsole('Starting SAFE streak farming (limited to account age)...', 'info');
+    if (!userInfo || !userInfo.streakData) {
+        logToConsole('User data not available yet. Please wait and try again.', 'error');
+        return;
+    }
     const hasStreak = !!userInfo.streakData?.currentStreak;
     const startStreakDate = hasStreak ? userInfo.streakData.currentStreak.startDate : new Date();
     const startFarmStreakTimestamp = Math.floor(new Date(startStreakDate).getTime() / 1000);
     let currentTimestamp = hasStreak ? startFarmStreakTimestamp - 86400 : startFarmStreakTimestamp;
+    const creationTimestamp = Math.floor(new Date(userInfo.creationDate).getTime() / 1000);
+    const maxSafeStreak = Math.floor((Math.floor(Date.now() / 1000) - creationTimestamp) / 86400) + 1; // +1
+
+    logToConsole(`Account created ≈ ${maxSafeStreak} days ago → max safe streak ≈ ${maxSafeStreak}`, 'info');
+    isRunning = true;
+    farmingStats.startTime = Date.now();
+    document.getElementById('_start_farming')?.style?.display && (document.getElementById('_start_farming').style.display = 'none');
+    document.getElementById('_stop_farming')?.style?.display && (document.getElementById('_stop_farming').style.display = 'block');
+
     while (isRunning) {
+        if (currentTimestamp < creationTimestamp) {
+            logToConsole(`🛑 Reached account creation date limit (${maxSafeStreak} days). Stopping safely.`, 'success');
+            sendDiscordWebhook?.("🔥 Safe Streak Farm Complete", "Limit Reached",
+                `Maximum safe streak achieved: **${userInfo.streak} days**\n(Cannot backdate before account creation)`, 15158332);
+            stopFarming();
+            break;
+        }
+
         try {
             await farmSessionOnce(currentTimestamp, currentTimestamp + 60);
             currentTimestamp -= 86400;
@@ -6797,14 +6612,83 @@ const farmStreak = async () => {
             updateUserInfo();
             updateEarnedStats();
             saveSessionData();
+
             logToConsole(`Streak increased to ${userInfo.streak}`, 'success');
-            sendDiscordWebhook("🔥 Streak Extended", "Success", `Current Streak: **${userInfo.streak} Days**`, 15158332);
+            if (totalEarned.streak % 10 === 0) {
+                sendDiscordWebhook?.("🔥 Streak Extended", "Safe Mode",
+                    `Current Streak: **${userInfo.streak} Days**\n(Safe farming active)`, 15158332);
+            }
             await delay(currentMode === 'safe' ? SAFE_DELAY : FAST_DELAY);
         } catch (error) {
             logToConsole(`Streak farming error: ${error.message}`, 'error');
             await delay((currentMode === 'safe' ? SAFE_DELAY : FAST_DELAY) * 2);
         }
     }
+};
+const farmStreakNormal = async () => {
+    logToConsole('⚠️ WARNING: Normal streak farming has higher ban risk!', 'warning');
+
+    const hasStreak = !!userInfo.streakData?.currentStreak;
+    const startStreakDate = hasStreak ? userInfo.streakData.currentStreak.startDate : new Date();
+    const startFarmStreakTimestamp = Math.floor(new Date(startStreakDate).getTime() / 1000);
+    let currentTimestamp = hasStreak ? startFarmStreakTimestamp - 86400 : startFarmStreakTimestamp;
+
+    const delayMs = currentMode === 'safe' ? SAFE_DELAY : FAST_DELAY;
+
+    while (isRunning) {
+        try {
+            await farmSessionOnce(currentTimestamp, currentTimestamp + 60);
+            currentTimestamp -= 86400;
+            totalEarned.streak++;
+            userInfo.streak++;
+
+            updateUserInfo();
+            updateEarnedStats();
+            saveSessionData();
+
+            logToConsole(`🔥 Streak increased to ${userInfo.streak}`, 'success');
+
+            if (userInfo.streak % 10 === 0) {
+                sendDiscordWebhook(
+                    "🔥 Streak Extended",
+                    "Success",
+                    `Current Streak: **${userInfo.streak} Days**`,
+                    15158332
+                );
+            }
+
+            await delay(delayMs);
+        } catch (error) {
+            logToConsole(`❌ Streak farming error: ${error.message}`, 'error');
+            await delay(delayMs * 2);
+        }
+    }
+};
+const getQuestTimestamp = (goalId) => {
+    const regex = /^(\d{4})_(\d{2})_monthly/;
+    const match = goalId.match(regex);
+    if (match) {
+        const year = parseInt(match[1]);
+        const month = parseInt(match[2]) - 1;
+        const date = new Date(Date.UTC(year, month, 15, 12, 0, 0));
+        return date.toISOString();
+    }
+    return new Date().toISOString();
+};
+
+const isQuestOlderThanAccount = (goalId) => {
+    if (!userInfo?.creationDate) return false;
+    const match = goalId.match(/^(\d{4})_(\d{2})_monthly/);
+    if (match) {
+        const year = parseInt(match[1]);
+        const month = parseInt(match[2]) - 1;
+        const creationDate = new Date(userInfo.creationDate);
+        const creationYear = creationDate.getFullYear();
+        const creationMonth = creationDate.getMonth();
+        if (year < creationYear) return true;
+        if (year === creationYear && month < creationMonth) return true;
+    }
+    return false;
 };
 const getJwtToken = () => {
     let match = document.cookie.match(new RegExp('(^| )jwt_token=([^;]+)'));
