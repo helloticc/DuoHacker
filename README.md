@@ -1,4 +1,4 @@
-# <img src="https://github.com/FutureCLI/DuoHacker/blob/main/Logo_TypePNG_DuoHacker.png?raw=true" width="60" height="60" style="vertical-align: middle; margin-right: 10px;"> DuoHacker – Duolingo Automation & XP Farming Tool
+# <img src="https://github.com/FutureCLI/DuoHacker/blob/main/images/Logo_GifType_DuoHacker.gif?raw=true" width="60" height="60" style="vertical-align: middle; margin-right: 10px;"> DuoHacker – Duolingo Automation & XP Farming Tool
 
 **<img src="https://d35aaqx5ub95lt.cloudfront.net/images/profile/01ce3a817dd01842581c3d18debcbc46.svg" width="20"> Unlimited XP • <img src="https://d35aaqx5ub95lt.cloudfront.net/images/gems/45c14e05be9c1af1d7d0b54c6eed7eee.svg" width="20"> Free Gems • <img src="https://d35aaqx5ub95lt.cloudfront.net/images/icons/398e4298a3b39ce566050e5c041949ef.svg" width="20"> Streak Protection • <img src="https://d35aaqx5ub95lt.cloudfront.net/images/super/11db6cd6f69cb2e3c5046b915be8e669.svg" width="20"> Free Super / Max**
 
@@ -30,9 +30,9 @@
 
 | Main Dashboard | XP & Gems Booster |
 | :---: | :---: |
-| <img src="https://github.com/FutureCLI/DuoHacker/blob/main/TN1_TypePNG.png?raw=true"> | <img src="https://github.com/helloticc/DuoHacker/blob/main/DuoHacker4.png?raw=true"> |
+| <img src="https://github.com/FutureCLI/DuoHacker/blob/main/images/TN1_TypePNG.png?raw=true"> | <img src="https://github.com/FutureCLI/DuoHacker/blob/main/images/TN4_TypePNG.png?raw=true"> |
 | **Free Item Shop** | **Quest Tool** |
-| <img src="https://github.com/FutureCLI/DuoHacker/blob/main/TN2_TypePNG.png?raw=true"> | <img src="https://github.com/helloticc/DuoHacker/blob/main/DuoHacker3.png?raw=true"> |
+| <img src="https://github.com/FutureCLI/DuoHacker/blob/main/images/TN2_TypePNG.png?raw=true"> | <img src="https://github.com/FutureCLI/DuoHacker/blob/main/images/TN3_TypePNG.png?raw=true"> |
 
 ---
 
