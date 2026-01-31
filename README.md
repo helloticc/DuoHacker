@@ -20,12 +20,6 @@
 
 ---
 
-## <img src="https://d35aaqx5ub95lt.cloudfront.net/vendor/ca9178510134b4b0893dbac30b6670aa.svg" width="32"> Watch It In Action
-
-<iframe width="100%" height="600" src="https://www.youtube.com/embed/CddgLLfPqUM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
----
-
 ## <img src="https://d35aaqx5ub95lt.cloudfront.net/images/profile/48b8884ac9d7513e65f3a2b54984c5c4.svg" width="32"> Screenshots
 
 | Main Dashboard | XP & Gems Booster |
@@ -79,7 +73,3 @@ Very low risk with Safe Mode. Use 2-4 hours daily max.
 *   [**<img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTKWBPH_zlCOipWfslhiZSjBNaVxiSzMfWaYg&s" width="20"> Join DuoHacker Discord Community!**](https://twisk.fun/discord)
 *   [**<img src="https://d35aaqx5ub95lt.cloudfront.net/vendor/ca9178510134b4b0893dbac30b6670aa.svg" width="20"> Visit DuoHacker YouTube Channel!**](https://www.youtube.com/@duohackertool)
 *   [**<img src="https://d35aaqx5ub95lt.cloudfront.net/vendor/784035717e2ff1d448c0f6cc4efc89fb.svg" width="20"> Star us on GitHub!**](https://github.com/helloticc/DuoHacker)
-
-*Video instructions for installation and use:*
-
-<iframe width="100%" height="600" src="https://www.youtube.com/embed/CddgLLfPqUM" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
